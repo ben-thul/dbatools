@@ -97,7 +97,7 @@ https://dbatools.io/Export-SqlUser
 		[Alias("NoOverwrite")]
 		[switch]$NoClobber,
 		[switch]$Append,
-		[switch]$IncludeSystemDatabases = $false
+		[switch]$IncludeSystemDatabases = $true
 	)
 	
 	DynamicParam 
@@ -271,38 +271,38 @@ https://dbatools.io/Export-SqlUser
                             #    ApplicationRoleCollection). Those that can't we iterate the
                             #    collection explicitly and add each object's permission.
 
-                            $obj_perms = @()
+                            $obj_perms = new-object System.Collections.ArrayList
 
-                            $obj_perms += $db.EnumObjectPermissions()
+                            $obj_perms.Add( $db.EnumObjectPermissions() )
                             foreach ($o in $db.ApplicationRoles) {
-                                $obj_perms += $o.EnumObjectPermissions()
+                                $obj_perms.Add( $o.EnumObjectPermissions() )
                             }
-                            $obj_perms += ($db.Assemblies).EnumObjectPermissions()
-                            $obj_perms += ($db.AsymmetricKeys).EnumObjectPermissions()
+                            $obj_perms.Add( ($db.Assemblies).EnumObjectPermissions() )
+                            $obj_perms.Add( ($db.AsymmetricKeys).EnumObjectPermissions() )
                             foreach ($o in $db.Certificates) {
-                                $obj_perms += $o.EnumObjectPermissions()
+                                $obj_perms.Add( $o.EnumObjectPermissions() )
                             }
                             foreach ($o in $db.DatabaseRoles) {
-                                $obj_perms += $o.EnumObjectPermissions()
+                                $obj_perms.Add( $o.EnumObjectPermissions() )
                             }
                             foreach ($o in $db.FullTextCatalogs) {
-                                $obj_perms += $o.EnumObjectPermissions()
+                                $obj_perms.Add( $o.EnumObjectPermissions() )
                             }
                             foreach ($o in $db.FullTextStopLists) {
-                                $obj_perms += $o.EnumObjectPermissions()
+                                $obj_perms.Add( $o.EnumObjectPermissions() )
                             }
                             foreach ($o in $db.SearchPropertyLists) {
-                                $obj_perms += $o.EnumObjectPermissions()
+                                $obj_perms.Add( $o.EnumObjectPermissions() )
                             }
-                            $obj_perms += ($db.ServiceBroker.MessageTypes).EnumObjectPermissions()
+                            $obj_perms.Add( ($db.ServiceBroker.MessageTypes).EnumObjectPermissions() )
                             foreach ($o in $db.RemoteServiceBindings) {
-                                $obj_perms += $o.EnumObjectPermissions()
+                                $obj_perms.Add( $o.EnumObjectPermissions() )
                             }
-                            $obj_perms += ($db.ServiceBroker.Routes).EnumObjectPermissions()
-                            $obj_perms += ($db.ServiceBroker.ServiceContracts).EnumObjectPermissions()
-                            $obj_perms += ($db.ServiceBroker.Services).EnumObjectPermissions()
-                            $obj_perms += ($db.SymmetricKeys).EnumObjectPermissions()
-                            $obj_perms += ($db.XmlSchemaCollections).EnumObjectPermissions()
+                            $obj_perms.Add( ($db.ServiceBroker.Routes).EnumObjectPermissions() )
+                            $obj_perms.Add( ($db.ServiceBroker.ServiceContracts).EnumObjectPermissions() )
+                            $obj_perms.Add( ($db.ServiceBroker.Services).EnumObjectPermissions() )
+                            $obj_perms.Add( ($db.SymmetricKeys).EnumObjectPermissions() )
+                            $obj_perms.Add( ($db.XmlSchemaCollections).EnumObjectPermissions() )
 
                             foreach ($ObjectPermission in $obj_perms | Where-Object {@("sa","dbo","information_schema","sys") -notcontains $_.Grantee -and $_.Grantee -notlike "##*" -and $dbuser.Name -contains $_.Grantee})
                             {
